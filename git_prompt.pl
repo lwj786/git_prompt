@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-chomp(my @git_status = `git status -b --porcelain=v2`);
+chomp(my @git_status = `git status -b --porcelain=v2 2> /dev/null`);
 exit if $? != 0;
 
 my @git_prompt;
