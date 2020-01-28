@@ -1,5 +1,7 @@
 #! /usr/bin/env perl
 
+@ARROW = qw / == <- -> <=> /;
+
 chomp(my @git_status = `git status -b --porcelain=v2 2> /dev/null`);
 exit if $? != 0;
 
@@ -14,9 +16,9 @@ for (qw / head ab upstream /) {
 
         my $branch_ab = (grep /$pattern/, @git_status)[0];
         if ($branch_ab ne '') {
-            $arrow = '--';
-            $arrow = '<-' if ($branch_ab =~ /\+[1-9]+/);
-            $arrow = ($arrow eq '<-') ? '<=>' : '->' if ($branch_ab =~ /-[1-9]+/);
+            $arrow = $ARROW[0];
+            $arrow = $ARROW[1] if ($branch_ab =~ /\+[1-9]+/);
+            $arrow = ($arrow eq $ARROW[1]) ? $ARROW[3]: $ARROW[2] if ($branch_ab =~ /-[1-9]+/);
         }
 
         push @git_prompt, ($arrow);
