@@ -21,7 +21,7 @@ for (qw / head ab upstream /) {
             $arrow = ($arrow eq $ARROW[1]) ? $ARROW[3]: $ARROW[2] if ($branch_ab =~ /-[1-9]+/);
         }
 
-        push @git_prompt, ($arrow);
+        push @git_prompt, ($arrow) if $arrow ne '';
     } else {
         push @git_prompt, (split / /, (grep /$pattern/, @git_status)[0])[-1];
     }
