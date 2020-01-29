@@ -32,7 +32,7 @@ for (qw / head ab upstream /) {
 my @status = map {
     $_ = (split)[1];
     s/[^.]/1/g; s/\./0/g; "0b" . $_
-} grep /^[12] /, @git_status;
+} grep /^[12u] /, @git_status;
 
 my $status = "0b00"; # 1 if changed
     #  index ___/\___ work tree
