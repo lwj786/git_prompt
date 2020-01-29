@@ -1,6 +1,7 @@
 #! /usr/bin/env perl
 
-@ARROW = qw / == <- -> <=> /;
+@ARROW = qw / == -> <- <=> /;
+@COLOR = qw / \e[00m \e[0;31m \e[0;32m \e[0;33m /;
 
 chomp(my @git_status = `git status -b --porcelain=v2 2> /dev/null`);
 exit if $? != 0;
@@ -17,8 +18,8 @@ for (qw / head ab upstream /) {
         my $branch_ab = (grep /$pattern/, @git_status)[0];
         if ($branch_ab ne '') {
             $arrow = $ARROW[0];
-            $arrow = $ARROW[1] if ($branch_ab =~ /\+[1-9]+/);
-            $arrow = ($arrow eq $ARROW[1]) ? $ARROW[3]: $ARROW[2] if ($branch_ab =~ /-[1-9]+/);
+            $arrow = $ARROW[1] if ($branch_ab =~ /-[1-9]+/);
+            $arrow = ($arrow eq $ARROW[1]) ? $ARROW[3]: $ARROW[2] if ($branch_ab =~ /\+[1-9]+/);
         }
 
         push @git_prompt, ($arrow) if $arrow ne '';
@@ -45,5 +46,21 @@ $status .= '?' if grep /^\?/, @git_status; # untracked files
 unshift @git_prompt, ($status);
 
 # output
-my $git_prompt = join ' ', @git_prompt;
-print $git_prompt . "\n";
+if (`tput colors` >= 8) {
+    unshift @git_prompt
+        , join '', (@COLOR[oct("0b" . $status)], shift @git_prompt, @COLOR[0]);
+
+    if (@git_prompt > 2) {
+        my $index;
+        for (0 .. (@ARROW - 1)) {
+            $index = $_;
+            last if $ARROW[$index] eq $git_prompt[2];
+        }
+
+        splice @git_prompt, 2, 1
+            , join '', (@COLOR[$index], $git_prompt[2], @COLOR[0])
+                if $index;
+    }
+}
+
+exec '/bin/echo', '-e', @git_prompt;
