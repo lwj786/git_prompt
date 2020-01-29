@@ -27,5 +27,23 @@ for (qw / head ab upstream /) {
     }
 }
 
+# index, work tree status
+my @status = map {
+    $_ = (split)[1];
+    s/[^.]/1/g; s/\./0/g; "0b" . $_
+} grep /^[12] /, @git_status;
+
+my $status = "0b00"; # 1 if changed
+    #  index ___/\___ work tree
+for (@status) {
+    $status |= $_;
+}
+
+$status =~ s/^0b//;
+$status .= '?' if grep /^\?/, @git_status; # untracked files
+
+unshift @git_prompt, ($status);
+
+# output
 my $git_prompt = join ' ', @git_prompt;
 print $git_prompt . "\n";
