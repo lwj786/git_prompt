@@ -1,7 +1,7 @@
 #! /usr/bin/env perl
 
 @ARROW = qw / == -> <- <=> /;
-@COLOR = qw / \e[00m \e[0;31m \e[0;32m \e[0;33m /;
+@COLOR = qw / \033[00m \033[0;31m \033[0;32m \033[0;33m /;
 
 chomp(my @git_status = `git status -b --porcelain=v2 2> /dev/null`);
 exit if $? != 0;
@@ -63,4 +63,4 @@ if (`tput colors` >= 8) {
     }
 }
 
-exec '/bin/echo', '-e', @git_prompt;
+exec '/usr/bin/printf', join ' ', @git_prompt;
